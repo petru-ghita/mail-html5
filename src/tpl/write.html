@@ -19,7 +19,8 @@
         <tags-input class="tags-input" ng-model="to" type="email" tabindex="1" add-on-space="true" add-on-enter="true" enable-editing-last-tag="true"
           tag-style="tagStyle" display-property="address" on-tag-added="verify($tag)" on-tag-removed="checkSendStatus()"
           allowed-tags-pattern='^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
-          placeholder="add recipient">
+          placeholder="add recipient"
+          wo-invite-tooltip>
           <auto-complete source="lookupAddressBook($query)" min-length="1"></auto-complete>
         </tags-input>
       </div>
@@ -70,4 +71,22 @@
     <button wo-touch="sendToOutbox()" class="btn" ng-class="{'btn--invalid': sendBtnSecure === false}"
       ng-disabled="!okToSend" tabindex="4">{{sendBtnText || 'Send'}}</button>
   </footer>
+
+  <!-- tooltips -->
+  <div id="invite-tooltip" class="tooltip">
+    <div class="tooltip__arrow"></div>
+    <div class="tooltip__title">Encryption not possible!</div>
+    <div class="tooltip__content">
+      <p>You can invite the recipient to Whiteout Mail to enable end-to-end encryption. Future messages will be encrypted automatically if the recipient accepts.</p>
+      <button class="btn btn--secondary" wo-touch="hideInvite()">
+        <svg><use xlink:href="#icon-decrypted" /><title>Unsecure</title></svg>
+        Cancel
+      </button>
+      <button class="btn" wo-touch="inviteNew()">
+        <svg><use xlink:href="#icon-encrypted" /><title>Secure</title></svg>
+        Invite
+      </button>
+    </div>
+  </div>
+
 </div>

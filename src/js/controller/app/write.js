@@ -6,7 +6,7 @@ var util = require('crypto-lib').util;
 // Controller
 //
 
-var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain, pgp, email, outbox, dialog, axe, status) {
+var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain, pgp, email, outbox, dialog, axe, status, invitation) {
 
     var str = appConfig.string;
     var cfg = appConfig.config;
@@ -20,6 +20,7 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
 
     $scope.state.writer = {
         write: function(replyTo, replyAll, forward) {
+            $scope.hideInvite();
             $scope.state.lightbox = 'write';
             $scope.replyTo = replyTo;
 
@@ -239,7 +240,10 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
                     recipient.key = key;
                     recipient.secure = true;
                 }
+            } else {
+                $scope.requestInvite(recipient);
             }
+
             $scope.checkSendStatus();
 
         }).catch(dialog.error);
@@ -301,6 +305,41 @@ var WriteCtrl = function($scope, $window, $filter, $q, appConfig, auth, keychain
 
     $scope.remove = function(attachment) {
         $scope.attachments.splice($scope.attachments.indexOf(attachment), 1);
+    };
+
+    /**
+     * Invite user
+     */
+    $scope.invite = function(user) {
+        var sender = auth.emailAddress,
+            recipient = user.address;
+
+        return $q(function(resolve) {
+            resolve();
+
+        }).then(function() {
+            return invitation.invite({
+                recipient: recipient,
+                sender: sender
+            });
+
+        }).then(function() {
+            var invitationMail = {
+                from: [{
+                    address: sender
+                }],
+                to: [{
+                    address: recipient
+                }],
+                cc: [],
+                bcc: [],
+                subject: str.invitationSubject,
+                body: str.invitationMessage
+            };
+            // send invitation mail
+            return outbox.put(invitationMail);
+
+        }).catch(dialog.error);
     };
 
     //

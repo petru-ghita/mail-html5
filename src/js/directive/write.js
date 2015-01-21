@@ -51,3 +51,39 @@ ngModule.directive('attachmentInput', function() {
         }
     };
 });
+
+ngModule.directive('woInviteTooltip', function($document, $timeout) {
+    return function(scope, elm) {
+        var tooltip = $document.find('#invite-tooltip'),
+            invitee;
+
+        scope.requestInvite = function(recipient) {
+            var tagList = elm.find('ul');
+            invitee = recipient;
+
+            // Compute tooltip position
+            var offsetElm = tagList.offset();
+            var offsetTooltipParent = tooltip.offsetParent().offset();
+
+            // Set tooltip position
+            tooltip[0].style.top = (offsetElm.top - offsetTooltipParent.top + tagList[0].offsetHeight / 2 - tooltip[0].offsetHeight / 2) + 'px';
+            tooltip[0].style.left = (offsetElm.left - offsetTooltipParent.left + tagList[0].offsetWidth) + 'px';
+
+            // Wait till browser repaint
+            $timeout(function() {
+                tooltip.addClass('tooltip--show');
+            });
+        };
+
+        scope.inviteNew = function() {
+            scope.invite(invitee);
+            scope.hideInvite();
+        };
+
+        scope.hideInvite = function() {
+            tooltip.removeClass('tooltip--show');
+            tooltip[0].style.top = '-9999px';
+            tooltip[0].style.left = '-9999px';
+        };
+    };
+});
